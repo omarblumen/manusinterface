@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+
+{% block title %}Welcome to Assistant App{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8 text-center">
+            <h1 class="display-4 mb-4">Welcome to Assistant App</h1>
+            <p class="lead mb-4">Your personal assistant for managing conversations, tasks, calendar events, and reminders.</p>
+            
+            {% if not current_user.is_authenticated %}
+            <div class="d-grid gap-2 d-md-flex justify-content-md-center">
+                <a href="{{ url_for('login')  }}" class="btn btn-primary btn-lg px-4 me-md-2">Login</a>
+                <a href="{{ url_for('register') }}" class="btn btn-outline-secondary btn-lg px-4">Register</a>
+            </div>
+            {% else %}
+            <div class="d-grid gap-2 d-md-flex justify-content-md-center">
+                <a href="{{ url_for('dashboard') }}" class="btn btn-primary btn-lg px-4">Go to Dashboard</a>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+    
+    <div class="row mt-5">
+        <div class="col-md-4 mb-4">
+            <div class="card h-100">
+                <div class="card-body text-center">
+                    <i class="bi bi-chat-dots text-primary" style="font-size: 2rem;"></i>
+                    <h5 class="card-title mt-3">Conversations</h5>
+                    <p class="card-text">Save and organize your conversations with the AI assistant for future reference.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="card h-100">
+                <div class="card-body text-center">
+                    <i class="bi bi-check2-square text-success" style="font-size: 2rem;"></i>
+                    <h5 class="card-title mt-3">To-Do Lists</h5>
+                    <p class="card-text">Create and manage your tasks with due dates, priorities, and completion tracking.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="card h-100">
+                <div class="card-body text-center">
+                    <i class="bi bi-calendar-event text-danger" style="font-size: 2rem;"></i>
+                    <h5 class="card-title mt-3">Calendar & Reminders</h5>
+                    <p class="card-text">Keep track of your events and set reminders for important tasks and appointments.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
