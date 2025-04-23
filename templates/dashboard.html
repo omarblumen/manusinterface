@@ -1,0 +1,199 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+    <h1 class="h2">Dashboard</h1>
+    <div class="btn-toolbar mb-2 mb-md-0">
+        <div class="btn-group me-2">
+            <a href="{{ url_for('conversations') }}" class="btn btn-sm btn-outline-secondary">All Conversations</a>
+            <a href="{{ url_for('todos') }}" class="btn btn-sm btn-outline-secondary">All To-Dos</a>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-6 mb-4">
+        <div class="card h-100">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">Recent Conversations</h5>
+                <a href="{{ url_for('conversations') }}" class="btn btn-sm btn-outline-primary">View All</a>
+            </div>
+            <div class="card-body">
+                {% if recent_conversations %}
+                    <div class="list-group">
+                        {% for conversation in recent_conversations %}
+                            <a href="{{ url_for('view_conversation', conversation_id=conversation.id) }}" class="list-group-item list-group-item-action">
+                                <div class="d-flex w-100 justify-content-between">
+                                    <h6 class="mb-1">{{ conversation.title }}</h6>
+                                    <small>{{ conversation.updated_at.strftime('%Y-%m-%d') }}</small>
+                                </div>
+                                <p class="mb-1">{{ conversation.content[:100] }}{% if conversation.content|length > 100 %}...{% endif %}</p>
+                            </a>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <p class="text-muted">No conversations yet.</p>
+                    <a href="{{ url_for('conversations') }}" class="btn btn-primary">Start a Conversation</a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-6 mb-4">
+        <div class="card h-100">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">Active To-Dos</h5>
+                <a href="{{ url_for('todos') }}" class="btn btn-sm btn-outline-primary">View All</a>
+            </div>
+            <div class="card-body">
+                {% if active_todos %}
+                    <div class="list-group">
+                        {% for todo in active_todos %}
+                            <div class="list-group-item list-group-item-action">
+                                <div class="d-flex w-100 justify-content-between">
+                                    <h6 class="mb-1">{{ todo.title }}</h6>
+                                    <small>
+                                        {% if todo.due_date %}
+                                            Due: {{ todo.due_date.strftime('%Y-%m-%d') }}
+                                        {% else %}
+                                            No due date
+                                        {% endif %}
+                                    </small>
+                                </div>
+                                {% if todo.description %}
+                                    <p class="mb-1">{{ todo.description }}</p>
+                                {% endif %}
+                                <div class="d-flex justify-content-between align-items-center mt-2">
+                                    <span class="badge bg-{% if todo.priority == 0 %}secondary{% elif todo.priority == 1 %}warning{% else %}danger{% endif %}">
+                                        {% if todo.priority == 0 %}Normal{% elif todo.priority == 1 %}Important{% else %}Urgent{% endif %}
+                                    </span>
+                                    <button class="btn btn-sm btn-outline-success toggle-todo" data-todo-id="{{ todo.id }}">Mark Complete</button>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <p class="text-muted">No active to-dos.</p>
+                    <a href="{{ url_for('todos') }}" class="btn btn-primary">Add a To-Do</a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-6 mb-4">
+        <div class="card h-100">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">Upcoming Events</h5>
+                <a href="{{ url_for('calendar') }}" class="btn btn-sm btn-outline-primary">View Calendar</a>
+            </div>
+            <div class="card-body">
+                {% if upcoming_events %}
+                    <div class="list-group">
+                        {% for event in upcoming_events %}
+                            <div class="list-group-item list-group-item-action">
+                                <div class="d-flex w-100 justify-content-between">
+                                    <h6 class="mb-1">{{ event.title }}</h6>
+                                    <small>{{ event.start_time.strftime('%Y-%m-%d %H:%M') }}</small>
+                                </div>
+                                {% if event.description %}
+                                    <p class="mb-1">{{ event.description }}</p>
+                                {% endif %}
+                                {% if event.location %}
+                                    <small class="text-muted">Location: {{ event.location }}</small>
+                                {% endif %}
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <p class="text-muted">No upcoming events.</p>
+                    <a href="{{ url_for('calendar') }}" class="btn btn-primary">Add an Event</a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-6 mb-4">
+        <div class="card h-100">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">Active Reminders</h5>
+                <a href="{{ url_for('reminders') }}" class="btn btn-sm btn-outline-primary">View All</a>
+            </div>
+            <div class="card-body">
+                {% if active_reminders %}
+                    <div class="list-group">
+                        {% for reminder in active_reminders %}
+                            <div class="list-group-item list-group-item-action">
+                                <div class="d-flex w-100 justify-content-between">
+                                    <h6 class="mb-1">{{ reminder.title }}</h6>
+                                    <small>{{ reminder.reminder_time.strftime('%Y-%m-%d %H:%M') }}</small>
+                                </div>
+                                {% if reminder.description %}
+                                    <p class="mb-1">{{ reminder.description }}</p>
+                                {% endif %}
+                                <div class="mt-2">
+                                    <button class="btn btn-sm btn-outline-success toggle-reminder" data-reminder-id="{{ reminder.id }}">Mark Complete</button>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <p class="text-muted">No active reminders.</p>
+                    <a href="{{ url_for('reminders') }}" class="btn btn-primary">Add a Reminder</a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // Handle todo toggle
+    document.querySelectorAll('.toggle-todo').forEach(button => {
+        button.addEventListener('click', function() {
+            const todoId = this.getAttribute('data-todo-id');
+            
+            fetch(`/toggle_todo/${todoId}`, {
+                method: 'POST',
+            })
+            .then(response => {
+                if (response.ok) {
+                    // Reload page to reflect changes
+                    window.location.reload();
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        });
+    });
+    
+    // Handle reminder toggle
+    document.querySelectorAll('.toggle-reminder').forEach(button => {
+        button.addEventListener('click', function() {
+            const reminderId = this.getAttribute('data-reminder-id');
+            
+            fetch(`/toggle_reminder/${reminderId}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ completed: true }),
+            })
+            .then(response => {
+                if (response.ok) {
+                    // Reload page to reflect changes
+                    window.location.reload();
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        });
+    });
+</script>
+{% endblock %}
